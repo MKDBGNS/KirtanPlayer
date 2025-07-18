@@ -1,15 +1,18 @@
-FROM debian:latest
+FROM python:3.11-slim
 
-RUN apt update && apt upgrade -y
-RUN apt install git curl python3-pip ffmpeg -y
-RUN pip3 install -U pip
-RUN curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
-    apt-get install -y nodejs && \
-    npm i -g npm
-COPY requirements.txt /requirements.txt
-RUN cd /
-RUN pip3 install -U -r requirements.txt
-RUN mkdir /MusicPlayer
-WORKDIR /MusicPlayer
-COPY start.sh /start.sh
-CMD ["/bin/bash", "/start.sh"]
+# Set working directory
+WORKDIR /app
+
+# Copy all files
+COPY . .
+
+# Create virtual environment
+RUN python3 -m venv /app/venv
+
+# Activate virtual environment and install dependencies
+ENV PATH="/app/venv/bin:$PATH"
+RUN pip install --upgrade pip
+RUN pip install -r requirements.txt
+
+# Start the bot
+CMD ["python", "main.py"]
